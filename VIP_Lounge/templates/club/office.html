@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head><title>Manager's Office</title></head>
+<body>
+    <h1>Manager's Back Office</h1>
+    <p>Welcome, {{ user.username }}. Only Managers may enter here.</p>
+    <a href="{% url 'member_lounge' %}">Go to Lounge</a> | 
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>

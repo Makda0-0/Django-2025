@@ -1,22 +1,26 @@
-from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import render, redirect
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required, permission_required
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+# Public home (anyone can see)
+def home(request):
+    return render(request, 'home.html')
 
-def lobby(request):
-    """Public lobby view - accessible to everyone"""
-    return render(request, 'club/lobby.html')
+# Simple wrappers for built-in views (you can also use as_view() directly in urls)
+def login_view(request):
+    return auth_views.LoginView.as_view(
+        template_name='registration/login.html',
+        redirect_authenticated_user=True
+    )(request)
 
-@login_required
+def logout_view(request):
+    return auth_views.LogoutView.as_view(next_page='home')(request)
+
+@login_required(login_url='login')   # Redirects to login if not authenticated
 def member_lounge(request):
-    """Member lounge - only for authenticated users"""
-    return render(request, 'club/lounge.html')
+    return render(request, 'lounge.html')
 
-def is_manager(user):
-    return user.groups.filter(name='Managers').exists() or user.is_superuser
-
-@login_required
-@user_passes_test(is_manager)
+@login_required(login_url='login')
+@permission_required('auth.view_group', raise_exception=True)  # or any permission you assigned
 def manager_office(request):
-    """Manager office - only for users in Managers group"""
-    return render(request, 'club/office.html')
+    return render(request, 'office.html')
